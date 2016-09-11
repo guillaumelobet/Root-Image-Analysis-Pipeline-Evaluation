@@ -1,4 +1,5 @@
 *.jpg
 *.rsml
 *.zip
-.RProj*
+*.RProj
+.R*
