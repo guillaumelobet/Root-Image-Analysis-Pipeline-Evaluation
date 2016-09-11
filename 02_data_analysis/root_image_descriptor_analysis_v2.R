@@ -23,7 +23,7 @@
 compute.raw.data   <- F                            # If the shape analysis has already been done, put FALSE to reuse the generated datafile
 color.plot         <- T                             # Make the plots in color
 species            <- c("dicot","monocot")             # the type of species to analyse
-base.dir           <- "~/Dropbox/research/projects/research/0_segment/segment_scripts"
+base.dir           <- "scripts_folder" # TO CHANGE WITH YOUR PATH
 n                  <- 500                              # This is the number of simulated root systems
 
 setwd(paste0(base.dir,"/00_data/results"))
@@ -66,12 +66,12 @@ if(color.plot){
 }
 
 getGroup <- function(name){
-  n1 <- gsub("/Users/guillaumelobet/Desktop/Work/segment/outputs/monocot/rsml/", "", name)
+  n1 <- gsub("monocot_rsml_folder/rsml/", "", name) # TO CHANGE WITH YOUR PATH
   strsplit(n1, "-")[[1]][3]
 }
 
 getID <- function(name){
-  n1 <- gsub("/Users/guillaumelobet/Desktop/Work/segment/outputs/monocot/rsml/", "", name)
+  n1 <- gsub("monocot_rsml_folder/rsml/", "", name) # TO CHANGE WITH YOUR PATH
   strsplit(n1, "-")[[1]][4]
 }
 
