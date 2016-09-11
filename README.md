@@ -12,3 +12,8 @@ This repository contains resources for the paper entitiled:
 > Guillaume Lobet, Iko Koevoets, Pierre Tocquin, Loïc Pagès and Claire Périlleux
 
 
+## Contents
+
+- **00_data**: contains the raw data used for the analysis
+- **01_image_analysis**: contains the scripts used for the generation of the image library. It contains the RIA-J scripts.
+- **02_data_analysis**: contains the scripts used for the data analysis and the figures of the paper.
