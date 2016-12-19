@@ -1,5 +1,5 @@
 
-[![DOI](https://zenodo.org/badge/20709/guillaumelobet/Root-Image-Analysis-Pipeline-Evaluation.svg)](https://zenodo.org/badge/latestdoi/20709/guillaumelobet/Root-Image-Analysis-Pipeline-Evaluation)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.208499.svg)](https://doi.org/10.5281/zenodo.208499)
 
 
 # Root-Image-Analysis-Pipeline-Evaluation
