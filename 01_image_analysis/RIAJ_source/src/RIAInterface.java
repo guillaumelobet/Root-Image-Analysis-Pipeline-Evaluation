@@ -107,9 +107,9 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	private JScrollPane getAboutTab(){
 
 
-		ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/MARIA_logo.png")));
-		JLabel logo = new JLabel("",icon, JLabel.CENTER);
-		logo.setPreferredSize(new Dimension(300, 250));
+//		ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/images/MARIA_logo.png")));
+//		JLabel logo = new JLabel("",icon, JLabel.CENTER);
+//		logo.setPreferredSize(new Dimension(300, 250));
 
 		// About
 
@@ -131,7 +131,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 
 		JPanel p1 = new JPanel(new BorderLayout());
 		p1.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-		p1.add(logo, BorderLayout.NORTH);
+//		p1.add(logo, BorderLayout.NORTH);
 		p1.add(aboutBox, BorderLayout.CENTER);
 
 	      return new JScrollPane(p1);
@@ -532,9 +532,9 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	 */
 	public String displayAboutText(){
 
-		String text = "\n MARIA is a plugin created and maintained by\n-\n"
+		String text = "\n RIAJ is a plugin created and maintained by\n-\n"
 				+"Guillaume Lobet - University of Liége\n"
-				+ "guillaume.lobet@ulg.ac.be\n"
+				+ "g.lobet@fz-juelich.de\n"
 				+ "@guillaumelobet\n"
 				+"-\n"
 				+"Iko Koevoets - University of Utrecht\n"

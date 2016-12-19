@@ -17,7 +17,7 @@ options(scipen=999) # Disable scientific notation
 #-----------------------------------------------------------------------------------------
 
 # Main directory, where everthing is stored
-dir.base <- "/Users/guillaumelobet/Dropbox/research/projects/research/0_segment/segment_scripts/"
+dir.base <- "/Users/g.lobet/OneDrive - UCL/03_research/0-segment/segment_scripts/"
 
 # Where is ArchiSimple folder
 setwd(paste0(dir.base, "01_image_generator/")) 
@@ -25,25 +25,28 @@ setwd(paste0(dir.base, "01_image_generator/"))
 
 # Simulation parameters
 verbatim          <- F      # Display messages
-delete_old        <- T      # Delete old simulation data
-create_rsml       <- T      # Create the RSML files ArchiSimple
+delete_old        <- F      # Delete old simulation data
+create_rsml       <- F      # Create the RSML files ArchiSimple
 create_images     <- T      # Using RSML_reader.jar
-analyse_images    <- T      # Using MARIA_J.jar
+analyse_images    <- T      # Using RIA_J.jar
 
 #-----------------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------
 
+# Degradation levels
+
+degrade <- c(1, 3)         # Level of degradation of the images (using the "Salt and pepper" operator in ImageJ)
 
 # Range of parameters
-P_specie_range              <- c("dicot")   # Type of species ("monocot", "dicot")
+P_specie_range              <- c("dicot", "monocot")   # Type of species ("monocot", "dicot")
 repetitions                 <- 500                      # number of repetitions
 replicates                  <- 10                      # Number of simulation by parameter sets ("synthetype")
-P_maxSegments               <- 8000                  # Max number of segments allowed in the simulation (this prevent the simulation to get out of hands)
+P_maxSegments               <- 10000                  # Max number of segments allowed in the simulation (this prevent the simulation to get out of hands)
 
 
 # Define parameters, either manually, or from and experimental dataset
-P_duree_range               <- c(20,20)               # Total length lenght of the simulation [days] 
+P_duree_range               <- c(20,30)               # Total length lenght of the simulation [days] 
 P_penteVitDiam_range        <- c(20, 60)              # Slope between the diameter and the root growth [-]
 P_angInitMoyVertPrim_range  <- c(0.8, 1.5)            # Emission angle for the principal roots. Between 0 and PI/2 [radian]
 P_intensiteTropisme_range   <- c(0.01, 0.3)           # strenght of the gravitropic response
@@ -54,13 +57,13 @@ P_maxLatAge_range           <- c(5, 20)               # Maximal age growing age 
 P_angLat_range              <- c(0.8, 1.5)            # Emission angle for the laterals [radian]
 
 P_nbMaxPrim_dicot           <- c(1,1)                # Number of primary axes. Put c(10,70) to have a monocot, c(1,1) to have a dicot
-P_coeffCroissRad_dicot      <- c(0.1,0.5)            # Coefficient of radial growth. 0 for monocots
+P_coeffCroissRad_dicot      <- c(0.1,0.4)            # Coefficient of radial growth. 0 for monocots
 P_nbMaxPrim_monocot         <- c(1,20)               # Number of primary axes. Put c(10,70) to have a monocot, c(1,1) to have a dicot
 P_coeffCroissRad_monocot    <- c(0,0)                # Coefficient of radial growth. 0 for monocots
 
 P_vitEmissionPrim_range     <- c(0.1, 2)             # Speed of emission of the primary roots [root/day]
 P_ageMaturitePointe_range   <- c(0.1, 3)             # Maturity age for the root tip [day]
-P_tertiary                  <- 0
+P_tertiary_range            <- c(0,1)                # Production of tertiary roots
 
 #------------------------------------------------------------------------
 #------------------------------------------------------------------------
@@ -76,7 +79,7 @@ P_type                  <- 1        # Type of simulation (1 = 3D, 2 = 2D, 3 = sh
 ## Primary roots
 P_slopePrimAngle        <- -0.3 # Slope btw the age of the and the insertion angle of the primary
 P_simultEmiss           <- 0 # Emmission of seminal roots, 3 days after the start (0 = NO, 1 = YES)
-P_nbSeminales           <- 5 # Number of seminal roots
+P_nbSeminales           <- 0 # Number of seminal roots
 
 ## Secondary roots
 P_diamMin               <-  0.02# 0.0014 # Min diameter for a root [mm]
@@ -95,28 +98,27 @@ t           <- Sys.time()
 tot_time    <- 0
 mean_time   <- NA
 
-for(P_specie in P_specie_range){
+setwd("./archisimple/") # Set the correct repository
 
+for(P_specie in P_specie_range){
+  
     # Set up the directories
-    dir.out       <- paste0(dir.base, "00_data")
+    dir.out       <- "data"
     dir.results   <- paste0(dir.out, "/results")
     dir.figs      <- paste0(dir.out, "/figures")
     dir.sp        <- paste0(dir.out, "/", P_specie)
     dir.img       <- paste0(dir.sp,"/images")
     dir.rsml      <- paste0(dir.sp,"/rsml")
-    dir.shape     <- paste0(dir.sp,"/shapes")
-    
+
     if(delete_old){
       unlink(dir.img, recursive = TRUE, force = TRUE)
       unlink(dir.rsml, recursive = TRUE, force = TRUE)
-      unlink(dir.shape, recursive = TRUE, force = TRUE)
     }
     dir.create(dir.out, showWarnings = F)
     dir.create(dir.results, showWarnings = F)
     dir.create(dir.sp, showWarnings = F)
     dir.create(dir.img, showWarnings = F)
     dir.create(dir.rsml, showWarnings = F)
-    dir.create(dir.shape, showWarnings = F)
     dir.create(dir.figs, showWarnings = F)
     
     
@@ -134,7 +136,6 @@ for(P_specie in P_specie_range){
 
 ######################## Create the RSML files
     if(create_rsml){
-      setwd("./archisimple/") # Set the correct repository
       
       params_range <- data.frame(penteVitDiam = numeric(), 
                                 nbMaxPrim = numeric(),
@@ -168,7 +169,8 @@ for(P_specie in P_specie_range){
           P_maxLatAge             <- round(runif(1,P_maxLatAge_range[1],P_maxLatAge_range[2]),3)
           P_duree                 <- round(runif(1,P_duree_range[1],P_duree_range[2]),0)
           P_coeffCroissRad        <- round(runif(1,P_coeffCroissRad_range[1],P_coeffCroissRad_range[2]),3)
-
+          P_tertiary              <- round(runif(1,P_tertiary_range[1],P_tertiary_range[2]),0)
+          
           for(k in 1:replicates){
             # Setup the name of the file, containing the principal info about the simulation
             name <- paste(basename, 
@@ -208,7 +210,7 @@ for(P_specie in P_specie_range){
             cat(var, file="param.txt", sep='\n') # Create the input file for Archisimple
             t <- Sys.time()
             
-            system("./ArchiSimp5Maria")  # Run Archisimple
+            system("./ArchiSimp5")  # Run Archisimple
             
             t1 <- Sys.time() - t
             tot_time <- tot_time + t1
@@ -226,7 +228,7 @@ for(P_specie in P_specie_range){
             percent <- percent + 5
           }
       }
-      setwd("../") # Back to the old repo
+      #setwd("../") # Back to the old repo
     }
   
     
@@ -234,14 +236,16 @@ for(P_specie in P_specie_range){
 
     if(create_images){
       message("Creating root images and ground truth data")
-      system(paste0('java -Xmx6000m -jar RSML_reader.jar ',dir.rsml,' ',dir.img,' "../00_data/results/root_data_',P_specie,'-',repetitions,'.csv"'))
+      for(deg in degrade) {
+        system(paste0('java -Xmx6000m -jar ../RSML_reader.jar ',dir.rsml,' ',dir.img,' ../../00_data/results/root_data_',P_specie,'-',repetitions,'.csv ',deg))
+      }
     }
   
 ######################## Analyse the images  ########################
     
     if(analyse_images){
       message("Analysing root images")
-      system(paste0('java -Xmx6000m -jar RIAJ.jar ',dir.img,' ../00_data/results/root_estimators_',P_specie,'-',repetitions,'.csv 300 true true ',dir.shape))  
+      system(paste0('java -Xmx6000m -jar ../RIAJ.jar ',dir.img,' ../../00_data/results/root_estimators_',P_specie,'-',repetitions,'.csv 30 false false ../ false false'))  
     }
 }
 #------------------------------------------------------------------------

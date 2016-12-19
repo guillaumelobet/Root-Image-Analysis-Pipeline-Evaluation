@@ -138,7 +138,7 @@ public class RootAnalysis {
 		
 		if(saveTPS) pwTPS = Util.initializeCSV(tpsFolder);
 		if(saveEFD) pwEFD = Util.initializeCSV(efdFolder);
-		printEFDCSVHeader();		
+		if(saveEFD) printEFDCSVHeader();		
 
 		
 		// Create the folder structure to store the images			
@@ -172,10 +172,13 @@ public class RootAnalysis {
 			baseName = images[i].getName();
 			fullName = images[i].getAbsolutePath();
 			
-			// Measure the image			
-			getDescriptors(nextImage, i);
-			sendAnalysisToCSV(nextImage.getTitle(), nextImage.getWidth(), nextImage.getHeight(), startD1, System.currentTimeMillis());
-
+			// Measure the image	
+			try{
+				getDescriptors(nextImage, i);
+				sendAnalysisToCSV(nextImage.getTitle(), nextImage.getWidth(), nextImage.getHeight(), startD1, System.currentTimeMillis());
+			}catch(Exception e){
+				System.out.println(e);
+			}
 			// Close the current image
 			nextImage.flush(); nextImage.close(); 
 			counter ++;
@@ -201,22 +204,26 @@ public class RootAnalysis {
 		if(verbatim) IJ.log("Pre-processing the image");
 		ImageProcessor ip = currentImage.getProcessor();
 		
+		
 		// Resize the image to speed up the analysis (resize to width = 800)		
 		scale = scalePix / scaleCm;
 		float widthCm = ip.getWidth() / scale;
-		int maxScale = 1000;
-		if(ip.getWidth() > maxScale){
-			float h = ip.getHeight();
-			float w = ip.getWidth();
-			ip = ip.resize(maxScale, (int) ((h / w) * maxScale));
-			scale = maxScale / widthCm;
-		}
+//		int maxScale = 1000;
+//		if(ip.getWidth() > maxScale){
+//			float h = ip.getHeight();
+//			float w = ip.getWidth();
+//			ip = ip.resize(maxScale, (int) ((h / w) * maxScale));
+//			scale = maxScale / widthCm;
+//		}
 		
 		// Convert to 8bit image if needed
 		if(ip.getBitDepth() != 8) ip = ip.convertToByte(true);
 
 		// If the root is white on black, then invert the image
-		if(!blackRoots) ip.invert();
+		if(!blackRoots){
+			ip.invert();
+			System.out.println("root inverted");
+		}
 		
 		// Threshold the image
 	    ip.setAutoThreshold("Otsu"); 
@@ -663,7 +670,7 @@ public class RootAnalysis {
 		if(verbatim) IJ.log("--------- Get Convex Hull");
 		// Get bounding box
         im.getProcessor().autoThreshold();
-		im.getProcessor().invert();
+		//im.getProcessor().invert();
 		pa = new ParticleAnalyzer(ParticleAnalyzer.ADD_TO_MANAGER | ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.AREA, rt, 0, 10e9);
 		pa.analyze(im);
 		
@@ -890,7 +897,7 @@ public class RootAnalysis {
 	 * Send parameters data to an CSV file
 	 */
 	private void sendParametersToCSV(){	
-		String toPrint = baseName;
+		String toPrint = baseName.replaceAll(",", "-");
 		for(int i = 0; i < params.length; i++){
 			toPrint = toPrint.concat(","+params[i]);
 		}
