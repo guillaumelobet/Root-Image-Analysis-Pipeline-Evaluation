@@ -21,8 +21,10 @@ For each root system, the script perfumes the following steps:
 
 Executable for the RSML_reader plugin. Can be run (on Unix) using:
 
-	java -jar RSML_reader.jar [rsml_files_directory] [image_files_directory] [ground_truth_data.csv]
-	
+	java -jar RSML_reader.jar [rsml_files_directory] [image_files_directory] [ground_truth_data.csv] [degradetion_level]
+
+The `degradation_level` indicates if you want to degrade the resulting image (0 = no degradation)
+
 ### RSML_reader_source
 
 Source files of the RSML_reader plugin for ImageJ.
